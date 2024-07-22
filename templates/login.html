@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>Register</title>
+        <link rel="stylesheet" href="/static/styles/login.css">
+    </head>
+    <body>
+        <body>
+        <form action="#" method="POST">
+            <div class="imgcontainer">
+              <img src="/static/images/img_avatar2.png" alt="Avatar" class="avatar">
+            </div>
+          
+            <div class="container">
+              <label for="uname"><b>Username <red>{{invalid_user}}</red></b></label>
+              <input type="text" placeholder="Enter Username" name="uname" required>
+          
+              <label for="psw"><b>Password <red>{{invalid_password}}</red></b></label>
+              <input type="password" placeholder="Enter Password" name="psw" required>
+          
+              <button type="submit">Login</button>
+              <label>
+                <input type="checkbox" checked="checked" name="remember"> Remember me
+              </label>
+            </div>
+          
+            <div class="container" style="background-color:#f1f1f1">
+              <a href='/' class="cancelbtn">Cancel</a>
+              <span class="psw">Forgot <a href="#">password?</a></span>
+            </div>
+          </form>
+          <h1 class="Just_signed">{{Just_Signed}}</h1>
+    </body>
+</html>
