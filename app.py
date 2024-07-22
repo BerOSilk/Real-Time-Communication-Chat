@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, abort
 import sqlite3 as sql
 import re
 
@@ -29,7 +29,7 @@ def insert(username, password, email):
     con = con = sql.connect('database/database.db')
     cur = con.cursor()
     cur.execute("INSERT INTO users (username, password, email) VALUES (?,?,?)", (username, password, email,))
-    cur.execute("INSERT INTO logged_in (username) VALUES (?,'NO','off')", (username,))
+    cur.execute("INSERT INTO logged_in (username,logged_in,remember) VALUES (?,'NO','off')", (username,))
     con.commit()
     con.close()
 
@@ -86,10 +86,14 @@ def is_valid_username(username):
     return False
 
 
+@app.route('/login/<Just_Signed>')
+def login_message(Just_Signed):
+    return login(Just_Signed)
+
 @app.route('/signup',methods=['POST','GET'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['uname']
         email = request.form['email']
         password = request.form['psw']
         rep_password = request.form['psw-repeat']
@@ -121,12 +125,38 @@ def signup():
             return render_template('register.html', not_valid_rep_psw = 'Passwords do not match')
 
         insert(username, password, email)
-        return render_template('login.html', Just_Signed ='Signed up successfully')
+        return redirect(url_for('login_message', Just_Signed ='Signed up successfully'))
 
     return render_template('register.html')
 
+
+@app.route('/<name>')
+def logged_in(name):
+
+    con = sql.connect('database/database.db')
+    cur = con.cursor()
+
+    cur.execute("SELECT logged_in FROM logged_in WHERE username = ?", (name,))
+    logged = cur.fetchone()
+
+    if not logged:
+        return abort(404)
+    
+    if logged[0] == 'YES':
+
+        cur.execute("SELECT email FROM users WHERE username =?", (name,))
+        user = cur.fetchone()
+        con.close()
+
+        if not user:
+            return abort(404)
+
+        return render_template('logged_in.html',user=name,email=user[0])
+    else:
+        return redirect(url_for('login_message', Just_Signed ='Please Sign In first'))
+
 @app.route('/login',methods=['POST','GET'])
-def login():
+def login(Just_Signed = ''):
     if request.method == 'POST':
         username = request.form['uname']
         password = request.form['psw']
@@ -146,13 +176,14 @@ def login():
         cur.execute("UPDATE logged_in SET logged_in = 'YES', remember =? WHERE username =?", (remember, username,))
         con.commit()
         con.close()
-        return render_template('logged_in.html', user = username, email=user[2])
+        return redirect(url_for('logged_in', name = username))
 
-    return render_template('login.html')
+    return render_template('login.html', Just_Signed=Just_Signed)
 
 
 @app.route('/')
 def index():
+
     return render_template('index.html')
 
 if __name__ == '__main__':
