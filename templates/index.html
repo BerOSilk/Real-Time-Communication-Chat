@@ -5,7 +5,10 @@
    <link rel="stylesheet" href="/static/styles/index.css">
 </head>
 <body>
-	<a href="{{ url_for('signup') }}">Register</a>
-	<a href="{{ url_for('login') }}">login</a>
+   <div id="container">
+	   <a href="{{ url_for('login_redirect') }}">login</a>
+	   <a href="{{ url_for('signup') }}">Register</a>
+   </div>
+   <script src="/static/js/index.js"></script>
 </body>
 </html>

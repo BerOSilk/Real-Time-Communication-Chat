@@ -44,11 +44,6 @@ form {
     margin: 24px 0 12px 0;
   }
   
-  /* Avatar image */
-  img.avatar {
-    width: 40%;
-  }
-  
   /* Add padding to containers */
   .container {
     padding: 16px;
