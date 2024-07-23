@@ -31,10 +31,60 @@ h2{
 }
 
 .status{
-    background-color: #04AA6D;
     width: 10px;
     height: 10px;
     border-radius: 50%;
     position: absolute;
     margin: 40px 35px;
+}
+
+.settings{
+    color: gray;
+    margin-left: -70px;
+    margin-top: 10px;
+    background: none;
+    border: none;
+}
+
+
+.chat-container{
+    margin-top: 15px;
+    width: 300px;
+    height: 800px;
+    border-right: 1px black solid;
+}
+
+.typing{
+    overflow: hidden;
+    animation: typing 3s infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 19px }
+}
+
+
+.chats{
+    display: flex;
+}
+
+.chat-search{
+    width: 90%;
+    border: none;
+    border-bottom: 1px black solid;
+}
+
+.chat-search:focus{
+    outline: none;
+}
+
+.users-container{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.users-container *{
+    margin-top: 15px;
 }

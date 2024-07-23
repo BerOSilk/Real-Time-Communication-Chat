@@ -10,10 +10,19 @@
     <div class="profile-container">
         <div class="name-container">
             <img class='pfp' src="/static/images/blank-profile-picture.png" alt="Profile Picture">
-            <div class="status"></div>
-            <h2>{{user}}</h2>
+            <div class="status" style="background-color: #04AA6D;"></div>
+            <h2 id="user">{{user}}</h2>
+            <button class="settings"><setting class="rotate">⚙</setting>Settings</button>
             <form method="POST"><button type="submit" class="logout-btn">logout →</button></form>
         </div>
     </div>
+    <div class="chat-container">
+        <h2 class="chats">Chats<div class="typing">...</div></h2>
+        <input type="text" class="chat-search" id="user-search" placeholder="search for users">
+        <div class="users-container" id="users-container">
+            {{users | safe }}
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>
