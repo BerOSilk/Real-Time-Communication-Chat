@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/static/styles/settings.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Settings</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="{{username}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{email}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="password">Password: <h6 id="updated"></h6></label>
+                <input type="hidden" name="updated-new-psw" id="updated-new-psw" value="">
+                <button type="button" name="update-password" id="update-button">Update →</button>
+            </div>
+            <div class="form-group">
+                <label for="display">Display Name:</label>
+                <input type="text" id="display" name="display" value="{{display_name}}">
+            </div>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select name="status" id="status">
+                    <option value="Online">Online</option>
+                    <option value="Do Not Disturb">Do Not Disturb</option>
+                    <option value="idle">idle</option>
+                    <option value="Invisible">Invisible</option>
+                  </select>
+            </div>
+            <div class="form-group">
+                <label for="profile-picture">Profile Picture:</label>
+                <img src="{{profile_picture}}" alt="profile-picture.png" class="pfp-img" id="pfp-img">
+                <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
+            </div>
+            <div class="form-group">
+                <button type="submit" name="submit-settings">Save Settings</button>
+            </div>
+        </form>
+        <a href="/" class="back-link">Back to Home</a>
+    </div>
+
+    <div class="sub-container" id="sub-container"></div>
+
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>

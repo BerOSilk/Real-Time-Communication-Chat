@@ -2,9 +2,19 @@ from flask import Flask, render_template, request, redirect, url_for, abort, mak
 import sqlite3 as sql
 import re
 from chat import module
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.register_blueprint(module)
+mail = Mail(app)
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = '2004.khalilbaraa@gmail.com'
+app.config['MAIL_PASSWORD'] = '123456hgf'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 con = sql.connect('instances/database.db')
 cur = con.cursor()
@@ -12,13 +22,15 @@ cur.execute('''
     CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY,
         password TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE);
+        email TEXT NOT NULL UNIQUE,
+        display_name TEXT,
+        pfp TEXT);
 ''')
 
 cur.execute('''
         CREATE TABLE IF NOT EXISTS logged_in (
             username TEXT PRIMARY KEY,
-            logged_in TEXT,
+            status TEXT,
             remember TEXT
             );
 ''')
@@ -29,8 +41,8 @@ con.close()
 def insert(username, password, email):
     con = con = sql.connect('instances/database.db')
     cur = con.cursor()
-    cur.execute("INSERT INTO users (username, password, email) VALUES (?,?,?)", (username, password, email,))
-    cur.execute("INSERT INTO logged_in (username,logged_in,remember) VALUES (?,'NO','off')", (username,))
+    cur.execute("INSERT INTO users (username, password, email,display_name,pfp) VALUES (?,?,?,?,?)", (username, password, email,username,'/static/images/blank-profile-picture.png'))
+    cur.execute("INSERT INTO logged_in (username,status,remember,loggedTEXT) VALUES (?,'ONLINE','off','NO')", (username,))
     con.commit()
     con.close()
 
@@ -81,9 +93,10 @@ def is_valid_username(username):
         return "username already exists"
 
     digit_regex = r'\d'
+    special_characters_regex = r'[!@#$%^&*(),?":{}|<>]'
 
-    if re.search(digit_regex, username):
-        return "username can't contain digits"
+    if re.search(digit_regex, username) or re.search(special_characters_regex, username):
+        return "username can't contain special characters"
     return False
 
 
@@ -126,41 +139,6 @@ def signup():
 
     return render_template('register.html')
 
-
-# @app.route('/<name>', methods=['POST','GET'])
-# def logged_in(name):
-
-#     con = sql.connect('database/database.db')
-#     cur = con.cursor()
-
-#     if request.method == 'POST':
-#         cur.execute("UPDATE logged_in SET logged_in = 'NO', remember='off' WHERE username = ?",(name,))
-#         con.commit()
-#         res = make_response(redirect('/'))
-#         res.set_cookie('myApp','',0)
-#         return res
-    
-
-
-#     cur.execute("SELECT logged_in FROM logged_in WHERE username = ?", (name,))
-#     logged = cur.fetchone()
-
-#     if not logged:
-#         return abort(404)
-    
-#     if logged[0] == 'YES':
-
-#         cur.execute("SELECT email FROM users WHERE username =?", (name,))
-#         user = cur.fetchone()
-#         con.close()
-
-#         if not user:
-#             return abort(404)
-
-#         return render_template('main.html',user=name,email=user[0])
-#     else:
-#         return redirect(url_for('login', message ='Please Sign In first'))
-
 @app.route('/login_redirect')
 def login_redirect():
     return redirect(url_for('login', message ='#'))
@@ -189,13 +167,13 @@ def login(message='#'):
             cur.execute('SELECT * FROM logged_in WHERE username = ?', (check_user,))
             res = cur.fetchone()
 
-            if res[2] == 'on':
-                return redirect(url_for('main', name = check_user))
+            if res[2] == 'ONLINE':
+                return redirect(url_for('module.main', name = check_user))
 
         res = make_response(redirect(url_for('module.main', name = username)))
         res.set_cookie('myApp', username)
 
-        cur.execute("UPDATE logged_in SET logged_in = 'YES', remember =? WHERE username =?", (remember, username,))
+        cur.execute("UPDATE logged_in SET loggedTEXT = 'YES', remember =? WHERE username =?", (remember, username,))
         con.commit()
         con.close()
         return res
@@ -212,8 +190,8 @@ def index():
         cur = con.cursor()
         cur.execute('SELECT * FROM logged_in WHERE username = ?', (username,))
         res = cur.fetchone()
-
-        if res[2] == 'on':
+        print(res[2])
+        if res and res[2] == 'on':
             return redirect(url_for('module.main', name = username))
 
     return render_template('index.html')

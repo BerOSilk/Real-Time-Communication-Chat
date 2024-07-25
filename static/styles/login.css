@@ -69,3 +69,19 @@ form {
   red{
     color: red;
   }
+
+
+  .show-psw {
+    position: absolute;
+    right: 30px;
+    margin-top: 30px;
+    width: 5px;
+    height: 5px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    background: url('/static//images/hide.png') no-repeat center;
+    background-size: cover;
+}

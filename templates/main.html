@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>logged In</title>
+    <title>main</title>
     <link rel="stylesheet" href="/static/styles/main.css">
 </head>
 <body>
     <div class="profile-container">
         <div class="name-container">
-            <img class='pfp' src="/static/images/blank-profile-picture.png" alt="Profile Picture">
-            <div class="status" style="background-color: #04AA6D;"></div>
+            <img class='pfp' src="{{pfp_path}}" alt="Profile Picture">
+            <div class="status" style="{{user_color}}"></div>
             <h2 id="user">{{user}}</h2>
-            <button class="settings"><setting class="rotate">⚙</setting>Settings</button>
+            <a href=" {{ url_for('module.settings' , name = user)}} " class="settings" id="settings">⚙Settings</a>
             <form method="POST"><button type="submit" class="logout-btn">logout →</button></form>
         </div>
     </div>

@@ -11,7 +11,7 @@
             <input type="text" placeholder="Enter Username" name="uname" required>
         
             <label for="psw"><b>Password <red>{{invalid_password}}</red></b></label>
-            <input type="password" id="psw" placeholder="Enter Password" name="psw" required><input type="checkbox" onclick="toggle_password_visibility()">Show Password
+            <input type="password" id="psw" placeholder="Enter Password" name="psw" required><button class='show-psw' id="show-psw" type="button" onclick="toggle_password_visibility('psw','show-psw')"></button>
         
             <button type="submit">Login</button>
             <label>
@@ -24,6 +24,6 @@
             <span class="psw">Forgot <a href="#">password?</a></span>
           </div>
         </form>
-        <script src="/static/js/login.js"></script>
+        <script src="/static/js/global.js"></script>
     </body>
 </html>
