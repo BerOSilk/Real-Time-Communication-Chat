@@ -5,24 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>main</title>
     <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="profile-container">
         <div class="name-container">
-            <img class='pfp' src="{{pfp_path}}" alt="Profile Picture">
-            <div class="status" style="{{user_color}}"></div>
-            <h2 id="user">{{user}}</h2>
-            <a href=" {{ url_for('module.settings' , name = user)}} " class="settings" id="settings">⚙Settings</a>
-            <form method="POST"><button type="submit" class="logout-btn">logout →</button></form>
+            <img class='pfp' src="{{pfp_path}}" alt="Profile Picture" id="user-pfp">
+            <div class="status" style="{{user_color}}"></div>       
+            <div class="t312">
+                <h2 id="user">{{user}}</h2>
+                <div class="t313">
+                    <a href=" {{ url_for('module.settings' , name = user)}} " class="settings" id="settings"><i style="font-size:16px" class="fa">&#xf013;</i></a>
+                    <form method="POST"><button type="submit" class="logout-btn"><i style="font-size:16px" class="fa">&#xf08b;</i></button></form>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="chat-container">
+    <div class="side-container">
         <h2 class="chats">Chats<div class="typing">...</div></h2>
         <input type="text" class="chat-search" id="user-search" placeholder="search for users">
         <div class="users-container" id="users-container">
             {{users | safe }}
         </div>
     </div>
+
+
+    <div class="chat-container" id="chat-container">
+        <div class="messages-container" id="messages-container">
+        </div>
+        <div class="input-container">
+            <div class="chat-input">
+                <label><input type="file" id="file-input" multiple>📁</label>
+                <input type="text" id="chat-message-input" placeholder="Type a message">
+                <button type="button" id="emoji-btn" onclick="send_message()"><div>Send</div></button>
+            </div>
+        </div>    
+    </div> 
+
+
+    <div class="user-profile-container" id="user-profile-container"></div>
+
     <script src="/static/js/main.js"></script>
 </body>
 </html>

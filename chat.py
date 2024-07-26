@@ -3,6 +3,8 @@ import sqlite3 as sql
 from flask_mail import Mail, Message 
 import re
 import os
+import datetime as dt
+
 
 module =  Blueprint('module',__name__)
 
@@ -14,7 +16,7 @@ def main(name):
     cur = con.cursor()
 
     if request.method == 'POST':
-        cur.execute("UPDATE logged_in SET status = 'OFFLINE', loggedTEXT='NO', remember='off' WHERE username = ?",(name,))
+        cur.execute("UPDATE logged_in SET loggedTEXT='NO', remember='off' WHERE username = ?",(name,))
         con.commit()
         res = make_response(redirect('/'))
         res.set_cookie('myApp','',0)
@@ -39,7 +41,7 @@ def main(name):
         cur.execute("SELECT * FROM logged_in WHERE username != ?",(name,))
         users_logged_in = cur.fetchall()
 
-        cur.execute("SELECT pfp,display_name FROM users WHERE username != ?",(name,))
+        cur.execute("SELECT pfp,display_name,username FROM users WHERE username != ?",(name,))
         users = cur.fetchall()
 
         users_chat = ""
@@ -49,22 +51,23 @@ def main(name):
 
         user_color = "background-color:"
 
-        if user_status == "Invisible":
-            user_color += 'gray'
-        elif user_status == 'Online':
-            user_color += '#04AA6D'
-        elif user_status == 'idle':
-            user_color += 'orange'
-        else:
-            user_color += '#f44336'
+        match user_status:
+            case 'Invisible':
+                user_color += 'gray'
+            case 'Online':
+                user_color += '#04AA6D'
+            case 'idle':
+                user_color += 'orange'
+            case _:
+                user_color += '#f44336'
 
         for logged,user in zip(users_logged_in,users):
 
             color = ''
 
-            if logged[1] == 'INVISIBLE' or logged[3] == 'NO':
+            if logged[1] == 'Invisible' or logged[3] == 'NO':
                 color = 'gray'
-            elif logged[1] == 'ONLINE':
+            elif logged[1] == 'Online':
                 color = '#04AA6D'
             elif logged[1] == 'idle':
                 color = 'orange'
@@ -72,9 +75,9 @@ def main(name):
                 color = '#f44336'
 
             users_chat += f'''<div class="name-container">
-                                <img class=\'pfp\' src="{user[0]}" alt="Profile Picture">
+                                <button type="button" onclick="load(\'{user[2]}\',\'load\')"><img class=\'pfp\' src="{user[0]}" alt="Profile Picture">
                                 <div class="status" style="background-color: {color}"></div>
-                                <h2>{user[1]}</h2>
+                                <h2>{user[1]}</h2></button>
                             </div>'''
 
         cur.execute('SELECT pfp from users where username = ?',(name,))
@@ -127,25 +130,120 @@ def settings(name):
             return redirect('/')
     return render_template('settings.html',username=name,email=res[2],profile_picture=res[4],display_name=res[3])
 
+
 @module.route('/render')
 def data():
-
-    name = request.args.get('name', '')
-    value = request.args.get('value', '')
-    value += '%'
     con = sql.connect('instances/database.db')
     cur = con.cursor()
-    cur.execute("SELECT * FROM logged_in WHERE username like ? and username != ?",(value,name,))
-    users = cur.fetchall()
+    req = request.args.get('request')
+    if req == 'search':
+        name = request.args.get('name', '')
+        value = request.args.get('value', '')
+        value = '%' + value + '%'
+        
+        cur.execute("SELECT status,loggedTEXT FROM logged_in JOIN users ON logged_in.username = users.username WHERE (display_name like ? or users.username like ?) and users.username != ?",(value,value,name,))
+        users_status = cur.fetchall()
 
-    print(users)
+        cur.execute("SELECT pfp,display_name,username FROM users WHERE (display_name like ? or username like ?) and username!=?",(value,value,name,))
+        users_settings = cur.fetchall()
 
-    users_chat = ''
-    
-    for user in users:
-        users_chat += f'<div class="name-container"><img class=\'pfp\' src="/static/images/blank-profile-picture.png" alt="Profile Picture"><div class="status" style="background-color: {'gray' if user[1] == 'OFFLINE' else '#04AA6D'}"></div><h2>{user[0]}</h2></div>'
 
-    return users_chat
+        users_chat = ''
+        
+        for logged,user in zip(users_status,users_settings):
+
+            color = ''
+
+            if logged[0] == 'INVISIBLE' or logged[1] == 'NO':
+                color = 'gray'
+            elif logged[0] == 'ONLINE':
+                color = '#04AA6D'
+            elif logged[0] == 'idle':
+                color = 'orange'
+            else:
+                color = '#f44336'
+
+            users_chat += f'''<div class="name-container">
+                                <button type="button" onclick="load(\'{user[2]}\',\'load\')"><img class=\'pfp\' src="{user[0]}" alt="Profile Picture">
+                                <div class="status" style="background-color: {color}"></div>
+                                <h2>{user[1]}</h2></button>
+                              </div>
+                            '''
+
+        return users_chat
+    elif req == 'load-profile':
+        target = request.args.get('target')
+        cur.execute('SELECT username,pfp,display_name FROM users WHERE username = ?',(target,))
+        res = cur.fetchone()
+
+        response = f'''
+        <div class="user-info-container">
+            <img src="{res[1]}" alt="pfp.png" id="side-profile-img">
+            <h1>{res[0]}</h1>
+            <h4>{res[2]}</h4>
+        </div>
+        <div class="line"></div>
+        <div class="general-info-container">
+            MORE COMING SOON
+        </div>
+
+        '''
+        
+        return response
+    elif req == 'load-chat':
+        target = request.args.get('target')
+        username = request.args.get('name')
+
+        cur.execute('SELECT * FROM messages WHERE (from_user = ? AND to_user = ?) OR (from_user = ? AND to_user = ?) ORDER BY msg_date',(target,username,username,target,))
+        res = cur.fetchall()
+        cur.execute('SELECT username,pfp FROM users WHERE username = ? or username = ?',(target,username))
+        users_pfp = cur.fetchall()
+        response = ''
+
+        last = ''
+
+        for msg in res:
+
+            pfp = ''
+
+            if msg[0] == users_pfp[0][0]:
+                pfp = users_pfp[0][1]
+            else:
+                pfp = users_pfp[1][1]
+
+            date = dt.datetime.strptime(msg[3], '%Y-%m-%d %H:%M:%S.%f')
+
+            now_date = dt.datetime.now()
+
+            time = date.strftime('%H') + ':' + date.strftime("%M") 
+
+            if date.strftime('%Y-%m-%d') != last:
+                if date.strftime('%Y-%m-%d') == now_date.strftime('%Y-%m-%d'):
+                    response += f'<div class="time">today</div>'
+                elif date.strftime('%Y-%m') == now_date.strftime('%Y-%m') and int(now_date.strftime('%d')) - int(date.strftime('%d')) == 1:
+                    response += f'<div class="time">yesterday</div>'
+                else:
+                    response += f'<div class="time">{date.strftime('%Y/%m/%d')}</div>'
+                last = date.strftime('%Y-%m-%d')
+
+            response += f'''
+
+                <div class="message">
+                    <img src="{pfp}" alt="pfp" class="profile-pic">
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="person">{msg[0]}</span>
+                            <span class="timestamp">{time}</span>
+                        </div>
+                        <div class="text">{msg[2]}</div>
+                    </div>
+                </div>
+                '''
+            
+    return response
+
+
+
 
 def is_valid_password(password):
     check_list = ['green' for i in range(4)]
@@ -194,6 +292,25 @@ def update():
             return jsonify({'message': 'Passwords do not match'})
         
         return jsonify({'message': new_psw})
+    
 
+@module.route('/send', methods=['POST'])
+def send():
 
+    data = request.json
 
+    con = sql.connect('instances/database.db')
+    cur = con.cursor()
+
+    name = data.get('name')
+    msg = data.get('msg')
+    to = data.get('to')
+
+    date_now = dt.datetime.now()
+
+    time_now = date_now.strftime('%H') + ':' + date_now.strftime('%M')
+
+    cur.execute('INSERT INTO messages VALUES (?,?,?,?)',(name,to,msg,date_now))
+    con.commit()
+
+    return jsonify({'time': time_now})
