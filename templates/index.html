@@ -1,14 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-   <title>index</title>
-   <link rel="stylesheet" href="/static/styles/index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In & Sign Up Forms</title>
+    <link rel="stylesheet" href="/static/styles/index.css">
 </head>
 <body>
-   <div id="container">
-	   <a href="{{ url_for('login_redirect') }}">login</a>
-	   <a href="{{ url_for('signup') }}">Register</a>
-   </div>
-   <script src="/static/js/index.js"></script>
+    <div class="container">
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <h1>Sign In</h1>
+                <input type="email" placeholder="Email" required />
+                <div class="password-container">
+                    <input type="password" placeholder="Password" required class="password-input" />
+                    <button type="button" class="toggle-password">Show</button>
+                </div>
+                <div class="remember-me-container">
+                    <input type="checkbox" id="rememberMe" />
+                    <label for="rememberMe">Remember Me</label>
+                </div>
+                <a href="#">Forgot your password?</a>
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Create Account</h1>
+                <input type="text" placeholder="Name" required />
+                <input type="email" placeholder="Email" required />
+                <div class="password-container">
+                    <input type="password" placeholder="Password" required class="password-input" id="passwordInput" />
+                    <button type="button" class="toggle-password">Show</button>
+                </div>
+                <ul class="password-rules">
+                    <li id="length" class="invalid">At least 8 characters</li>
+                    <li id="uppercase" class="invalid">At least one uppercase letter</li>
+                    <li id="lowercase" class="invalid">At least one lowercase letter</li>
+                    <li id="number" class="invalid">At least one number</li>
+                    <li id="special" class="invalid">At least one special character</li>
+                </ul>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start your journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/index.js"></script>
 </body>
 </html>

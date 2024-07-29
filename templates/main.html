@@ -16,7 +16,7 @@
                 <h2 id="user">{{user}}</h2>
                 <div class="t313">
                     <a href=" {{ url_for('module.settings' , name = user)}} " class="settings" id="settings"><i style="font-size:16px" class="fa">&#xf013;</i></a>
-                    <form method="POST"><button type="submit" class="logout-btn"><i style="font-size:16px" class="fa">&#xf08b;</i></button></form>
+                    <form method="POST"><button type="button" class="logout-btn" onclick="send_logout_request()"><i style="font-size:16px" class="fa">&#xf08b;</i></button></form>
                 </div>
             </div>
         </div>
@@ -42,9 +42,9 @@
         </div>    
     </div> 
 
-
     <div class="user-profile-container" id="user-profile-container"></div>
 
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>
