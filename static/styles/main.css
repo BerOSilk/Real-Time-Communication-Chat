@@ -134,6 +134,7 @@ button:hover{
     padding: 10px;
     background-color: #fff;
     overflow-y: auto;
+    overflow-wrap: break-word;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
@@ -296,4 +297,49 @@ button:hover{
 
 .active-user{
     background-color: #ddd;
+}
+
+.general-info-container button{
+    width: fit-content;
+    border-radius: 50px;
+    height: 25px;
+}
+
+.general-info-container button:hover{
+    text-decoration: black underline;
+    background-color: inherit;
+}
+
+.general-info-container button.green{
+    color : lime;
+    /* color: black; */
+}
+
+.general-info-container button.red{
+    color: red;
+}
+
+.menu{
+    border: 1px black solid;
+    display: flex;
+    border-radius: 5px;
+}
+
+.menu *{
+    padding: 2px;
+    border-radius: 5px;
+}
+
+.menu div:hover{
+    background-color: lightgray;
+}
+
+
+#actions-container{
+    border: 1px black solid;
+    height: 0px;
+    display: flex;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    transition: height 1s;
 }

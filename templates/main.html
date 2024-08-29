@@ -10,13 +10,13 @@
 <body>
     <div class="profile-container">
         <div class="name-container">
-            <img class='pfp' src="{{pfp_path}}" alt="Profile Picture" id="user-pfp">
+            <img class='pfp' src="{{ url_for('pfp.request_pfp', name = user)}}" alt="Profile Picture" id="user-pfp">
             <div class="status" style="{{user_color}}"></div>       
             <div class="t312">
                 <h2 id="user">{{user}}</h2>
                 <div class="t313">
                     <a href=" {{ url_for('module.settings' , name = user)}} " class="settings" id="settings"><i style="font-size:16px" class="fa">&#xf013;</i></a>
-                    <form method="POST"><button type="button" class="logout-btn" onclick="send_logout_request()"><i style="font-size:16px" class="fa">&#xf08b;</i></button></form>
+                    <form method="POST"><button id="logout-btn" type="button" class="logout-btn"><i style="font-size:16px" class="fa">&#xf08b;</i></button></form>
                 </div>
             </div>
         </div>
@@ -39,12 +39,22 @@
                 <input type="text" id="chat-message-input" placeholder="Type a message">
                 <button type="button" id="emoji-btn" onclick="send_message()"><div>Send</div></button>
             </div>
-        </div>    
+        </div> 
+        <div id="actions-container"></div>
+        <div id="files-container"></div>   
     </div> 
 
     <div class="user-profile-container" id="user-profile-container"></div>
-
+    
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+
+    <script>
+        let name = document.querySelector('.profile-container .name-container .t312 h2').textContent
+        let user_status = getComputedStyle(document.querySelector('.profile-container .name-container .status')).backgroundColor
+        io().emit('py_login_request',{user : name,status : user_status})
+
+    </script>
+
     <script src="/static/js/main.js"></script>
 </body>
 </html>

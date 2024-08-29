@@ -25,7 +25,8 @@ togglePasswordButtons.forEach(button => {
     });
 });
 
-const passwordInput = document.getElementById('passwordInput');
+const passwordInput = document.getElementById('psw');
+const c_passwordInput = document.getElementById('confirm-psw');
 const passwordRules = {
     length: document.getElementById('length'),
     uppercase: document.getElementById('uppercase'),
@@ -48,7 +49,4 @@ passwordInput.addEventListener('input', () => {
 
     passwordRules.number.classList.toggle('valid', /\d/.test(value));
     passwordRules.number.classList.toggle('invalid', !/\d/.test(value));
-
-    passwordRules.special.classList.toggle('valid', /[!@#$%^&*(),.?":{}|<>]/.test(value));
-    passwordRules.special.classList.toggle('invalid', !/[!@#$%^&*(),.?":{}|<>]/.test(value));
 });

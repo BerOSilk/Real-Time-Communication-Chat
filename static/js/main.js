@@ -1,4 +1,8 @@
-document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight
 
 function fetchData(value,request){
 
@@ -14,20 +18,42 @@ function fetchData(value,request){
 
 
 document.addEventListener('DOMContentLoaded',()=>{
+
     const search = document.getElementById("user-search");
     search.addEventListener('input', () => {
         fetchData(search.value,'search');
     });
 
-   
+    const logout = document.getElementById('logout-btn')
+    logout.addEventListener('click', () => {
+        let user = document.getElementById('user').textContent
+    
+        const url = `/main/${user}`
+        fetch(url,{
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user: user
+            })
+        }).then(response => {
+            if(response.redirected){
+                window.location.href = response.url;
+            }else{
+                return response;
+            }
+        })
+    })
+
 
 });
 
 
+
 function load_chat(target, request) {
     const name = document.getElementById('user').textContent;
-    const url = `/render?name=${name}&request=${request}-chat&target=${target}`;
-
+    const url = `/render?name=${name}&request=${request}-chat&target=${target}`;    
     fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -43,6 +69,40 @@ function load_chat(target, request) {
         .catch(error => {
             console.error('There was a problem loading chat:', error);
         });
+    
+    sleep(100).then(() => {
+        const url2 = `/render?name=${name}&request=${request}-id&target=${target}`;
+    
+        fetch(url2)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                for(let i in data.id){
+                    let tgt = document.getElementById(`message${data.id[i][0]}`)
+                    
+                    tgt.addEventListener("mouseleave",(event) =>{
+                        document.getElementById(data.id[i][0]).style.visibility = "hidden";
+                    })
+                    
+                    
+                    tgt.addEventListener("mouseenter",(event) =>{
+                        if(tgt.contains(event.target)){
+                            document.getElementById(data.id[i][0]).style.visibility = "visible";
+                        }
+                    })
+
+                    
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem loading chat:', error);
+            });
+    })
+
 }
 
 function load_profile(target, request) {
@@ -65,6 +125,8 @@ function load_profile(target, request) {
         });
 }
 
+
+
 function load(target, request) {
 
     let active_user = document.querySelector('.active-user')
@@ -77,8 +139,15 @@ function load(target, request) {
 
     side_user.className = 'name-container active-user'
 
+    const new_msg = document.getElementById('new-msg')
+    if(new_msg){
+        new_msg.remove()
+    }
+
     load_profile(target, request);
     load_chat(target, request);
+
+    const ac = document.getElementById("actions-container");
 }
 
 document.getElementById('chat-message-input').addEventListener('keydown', (event) => {
@@ -131,73 +200,117 @@ function createMessageElement(fromUser, textContent, timeContent, pfp_src) {
 io().on('receive_data', (data) => {
     let user_check = document.getElementById('user')
     if (user_check.textContent == data.from_user){
-        let active_chat = document.getElementById(data.target)
+        let active_chat = document.getElementById(data.target);
         if(active_chat.className.indexOf('active-user') != -1){
-            let pfp_src = active_chat.querySelector('.pfp').src
-            const message = createMessageElement(data.target, data.message, data.time_now, pfp_src);
+            let pfp_src = active_chat.querySelector('.pfp').src;
+            const message = createMessageElement(data.header, data.message, data.time_now, pfp_src);
             document.getElementById('messages-container').appendChild(message);
-            document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight
+            document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight;
+        }else{
+            let new_message = document.getElementById('new-msg');
+            if(new_message){
+                let value = new_message.textContent;
+                new_message.textContent = Number(value) + 1;
+            }else{
+                new_message = document.createElement('div');
+                new_message.id = 'new-msg';
+                new_message.textContent = '1';
+                active_chat.append(new_message);
+            }            
         }
+        var audio = new Audio('/static/audios/notification.wav');
+        audio.play();
     }
 });
 
-function send_message() {
-    const user = document.getElementById('user').textContent;
+function send_message(req) {
+
     const chatInput = document.getElementById('chat-message-input');
+    const user = document.getElementById('user').textContent;
     const sentTo = document.querySelector('.user-info-container h1').textContent;
 
-    const message = createMessageElement(user, chatInput.value, '',document.getElementById('user-pfp').src);
+    const ac = document.getElementById('actions-container');
 
-    document.getElementById('messages-container').appendChild(message);
+    if(ac.textContent.indexOf("Replying") != -1){
+        let header = user
+        header += " Replied to ";
+        if(ac.textContent.indexOf("yourself") != -1) header += "himself";
+        else header += sentTo;
+        const message = createMessageElement(header,chatInput.value,'',document.getElementById('user-pfp').src);
+        document.getElementById('messages-container').appendChild(message);
+        
 
-    fetch('/send', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: user,
-            msg: chatInput.value,
-            to: sentTo
+    
+        fetch('/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                request: 'reply',
+                name: user,
+                msg: chatInput.value,
+                to: sentTo,
+                id: document.querySelector("#actions-container button").className
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        message.querySelector('.timestamp').textContent = data.time;
-    })
-    .catch(error => {
-        console.error('Error sending message:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            message.querySelector('.timestamp').textContent = data.time;
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+        
+        io().emit('request_data', {to_user: sentTo, msg: chatInput.value, from_user: user, header: header });
 
-    io().emit('request_data', { to_user: sentTo, msg: chatInput.value, from_user: user });
+        ac.innerHTML = "";
+        ac.style.height = "0px";
 
+    }else{
+        const message = createMessageElement(user, chatInput.value, '',document.getElementById('user-pfp').src);
+
+        document.getElementById('messages-container').appendChild(message);
+    
+        fetch('/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                request: 'send',
+                name: user,
+                msg: chatInput.value,
+                to: sentTo
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            message.querySelector('.timestamp').textContent = data.time;
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+    
+        io().emit('request_data', {to_user: sentTo, msg: chatInput.value, from_user: user, header: user });
+    }
     chatInput.value = '';
     document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight
 }
 
 io().on('login_request', (data) => {
+    // alert(data.status)
     let user_side = document.getElementById(data.user);
     if(user_side){
         let status = user_side.querySelector('.status');
         if(status){
-            switch(data.status){
-                case 'Online':
-                    status.style.backgroundColor = '#04AA6D';
-                    break;
-                case 'Invisible':
-                    status.style.backgroundColor = 'gray';
-                    break;
-                case 'idle':
-                    status.style.backgroundColor = 'orange';
-                    break;
-                default:
-                    status.style.backgroundColor = '#f44336';
-            }
+            status.style.backgroundColor = data.status
         }
     }
 })
 
 io().on('logout_request', (data) =>{
+    // alert(data.user)
     let user_side = document.getElementById(data.user);
     if(user_side){
         let status = user_side.querySelector('.status');
@@ -205,29 +318,50 @@ io().on('logout_request', (data) =>{
             status.style.backgroundColor = 'gray';
         }
     }
-}) 
+})
 
 
-function send_logout_request(){
-    let user = document.getElementById('user').textContent
-    io().emit('send_logout_request', { user: user });
 
-    const url = `/main/${user}`
-    fetch(url,{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            user: user
-        })
-    }).then(response => {
-        if(response.redirected){
-            window.location.href = response.url;
-        }else{
-            return response;
-        }
-    }).then(response => response.json())
+function reply(id){
 
+    const ac = document.getElementById("actions-container");
+    ac.style.height = "20px";
+    
+
+    const cancel = document.createElement("button");
+    cancel.textContent = "cancel";
+    cancel.type = "button";
+    cancel.style.width = "50px";
+    cancel.className = `${id}`;
+    
+    cancel.addEventListener("mouseenter", (event) => {
+        event.target.style.background = "none";
+        event.target.style.textDecoration = "underline";
+    })
+
+    cancel.addEventListener("mouseout", (event) => {
+        event.target.style.textDecoration = "none";
+    })
+
+    cancel.addEventListener("click", () => {
+        ac.innerHTML = "";
+        ac.style.height = "0";
+    })
+
+    username = document.getElementById('user').textContent;
+    reply_to = document.querySelector(`#message${id} .message-content .message-header .person`).textContent;
+
+    let text = "";
+
+    if(username === reply_to){
+        text = " Replying to yourself";
+    }else{
+        text = ` Replying to ${reply_to}`;
+    }
+
+    ac.innerHTML = text;
+    ac.appendChild(cancel);
+
+    // send_message(text);
 
 }

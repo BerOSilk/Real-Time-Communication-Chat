@@ -1,7 +1,9 @@
 from flask import Blueprint,request,jsonify
-import sqlite3 as sql
+from classes.database import Database
 import re
  
+db = Database("database")
+
 udt =  Blueprint('update',__name__)
 
 def is_valid_password(password):
@@ -23,8 +25,8 @@ def update():
     data = request.json
     passed = data.get('button')
 
-    con = sql.connect('instances/database.db')
-    cur = con.cursor()
+    # con = sql.connect('instances/database.db')
+    # cur = con.cursor()
 
     if passed == 'Cancel':
         ret_form = f'<div><h1>Change Password</h1><form method="POST"><div class="form-group"><label id="old-psw">Old Password <label id="old-psw-error"></label> </label><input type="text" id="old-psw-input" name="old-psw" placeholder="old password"></div><div class="form-group"><label id="new-psw">new Password <label id="new-psw-error"></label></label><input type="text" id="new-psw-input" name="new-psw" placeholder="new password"></div><div class="form-group"><label id="confirm-psw">confirm Password <label id="confirm-psw-error"></label></label><input type="text" id="confirm-psw-input" name="confirm-psw" placeholder="confirm password"></div><div class="form-group"><button type="button" name="submit-settings" onclick="change(\'Update\')">Change</button></div></form></div>'
@@ -33,10 +35,12 @@ def update():
     if passed == 'Update':
         old_psw = data.get('old_psw')
 
-        cur.execute('SELECT password FROM users WHERE username = ?',(data.get('user'),))
-        res = cur.fetchone()
+        res = list(db.find("users",{"username": data.get('user')},{"password": 1}))
 
-        if res[0] != old_psw:
+        # cur.execute('SELECT password FROM users WHERE username = ?',(data.get('user'),))
+        # res = cur.fetchone()
+
+        if res[0]["password"] != old_psw:
             return jsonify({'message': 'Incorrect password'})
         
         new_psw = data.get('new_psw')

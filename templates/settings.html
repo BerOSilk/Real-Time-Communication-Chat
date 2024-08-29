@@ -30,15 +30,15 @@
             <div class="form-group">
                 <label for="status">Status:</label>
                 <select name="status" id="status">
-                    <option value="Online">Online</option>
+                    <option value="online">Online</option>
                     <option value="Do Not Disturb">Do Not Disturb</option>
                     <option value="idle">idle</option>
-                    <option value="Invisible">Invisible</option>
+                    <option value="invisible">Invisible</option>
                   </select>
             </div>
             <div class="form-group">
                 <label for="profile-picture">Profile Picture:</label>
-                <img src="{{profile_picture}}" alt="profile-picture.png" class="pfp-img" id="pfp-img">
+                <img src="{{ url_for('pfp.request_pfp', name = username)}}" alt="profile-picture.png" class="pfp-img" id="pfp-img">
                 <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
             </div>
             <div class="form-group">

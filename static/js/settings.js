@@ -76,31 +76,31 @@ function change(argument){
     })
 }
 
-document.getElementById('inputField').addEventListener('input', function () {
-    const input = this.value.toLowerCase();
-    const dropdownList = document.getElementById('dropdownList');
+// document.getElementById('inputField').addEventListener('input', function () {
+//     const input = this.value.toLowerCase();
+//     const dropdownList = document.getElementById('dropdownList');
 
-    const suggestions = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew'];
+//     const suggestions = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew'];
 
-    const filteredSuggestions = suggestions.filter(item => item.toLowerCase().includes(input));
+//     const filteredSuggestions = suggestions.filter(item => item.toLowerCase().includes(input));
 
-    dropdownList.innerHTML = '';
+//     dropdownList.innerHTML = '';
 
-    if (filteredSuggestions.length > 0 && input.length > 0) {
-        filteredSuggestions.forEach(suggestion => {
-            const li = document.createElement('li');
-            li.textContent = suggestion;
-            li.addEventListener('click', function () {
-                document.getElementById('inputField').value = suggestion;
-                dropdownList.classList.add('hidden');
-            });
-            dropdownList.appendChild(li);
-        });
-        dropdownList.classList.remove('hidden');
-    } else {
-        dropdownList.classList.add('hidden');
-    }
-});
+//     if (filteredSuggestions.length > 0 && input.length > 0) {
+//         filteredSuggestions.forEach(suggestion => {
+//             const li = document.createElement('li');
+//             li.textContent = suggestion;
+//             li.addEventListener('click', function () {
+//                 document.getElementById('inputField').value = suggestion;
+//                 dropdownList.classList.add('hidden');
+//             });
+//             dropdownList.appendChild(li);
+//         });
+//         dropdownList.classList.remove('hidden');
+//     } else {
+//         dropdownList.classList.add('hidden');
+//     }
+// });
 
 document.addEventListener('click', function (event) {
     const dropdownList = document.getElementById('dropdownList');

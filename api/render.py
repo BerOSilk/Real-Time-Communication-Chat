@@ -1,60 +1,91 @@
-from flask import Blueprint,request
+from flask import Blueprint,request,jsonify,url_for
+from classes.database import Database
 import sqlite3 as sql
 import datetime as dt
+
+db = Database('database')
 
 render =  Blueprint('render',__name__)
 
 @render.route('/render')
 def data():
-    con = sql.connect('instances/database.db')
-    cur = con.cursor()
+    # con = sql.connect('instances/database.db')
+    # cur = con.cursor()
+
     req = request.args.get('request')
     if req == 'search':
         name = request.args.get('name', '')
         value = request.args.get('value', '')
-        value = '%' + value + '%'
-        
-        cur.execute("SELECT users.username,pfp,display_name,status,loggedTEXT FROM logged_in JOIN users ON logged_in.username = users.username WHERE (display_name like ? or users.username like ?) and users.username != ? ORDER BY loggedTEXT DESC",(value,value,name,))
-        users = cur.fetchall()
+        value_regex = {'$regex': value, '$options': 'i'}
+        query = {
+            "$or":[
+                {"display_name": value_regex},
+                {"username": value_regex}
+            ],
+            "username": {"$ne": name}
+            }
+        attributes = {
+                "username": 1,
+                "display_name": 1,
+                "status": 1
+            }
+        users = list(db.find("users",query,attributes))
+
+        # cur.execute("SELECT users.username,pfp,display_name,status FROM users WHERE (display_name like ? or users.username like ?) and users.username != ?",(value,value,name,))
+        # users = cur.fetchall()
 
 
         users_chat = ''
         
         for user in users:
+            
+            logged = list(db.find("logged_in",{"username": user["username"]},{"user_agent": 1}))
+
+            # cur.execute("SELECT user_agent FROM logged_in WHERE username = ?",(user[0],))
+            # logged = cur.fetchone()
 
             color = ''
 
-            if user[3] == 'Invisible' or user[4] == 'NO':
+            if user["status"] == 'invisible' or logged == []:
                 color = 'gray'
-            elif user[3] == 'Online':
+            elif user["status"] == 'online':
                 color = '#04AA6D'
-            elif user[3] == 'idle':
+            elif user["status"] == 'idle':
                 color = 'orange'
             else:
                 color = '#f44336'
 
-            users_chat += f'''<div class="name-container">
-                                <button type="button" onclick="load(\'{user[0]}\',\'load\')"><img class=\'pfp\' src="{user[1]}" alt="Profile Picture">
+            users_chat += f'''<div class="name-container" id={user["username"]}>
+                                <button type="button" onclick="load(\'{user["username"]}\',\'load\')"><img class=\'pfp\' src="{ url_for('pfp.request_pfp', name = user["username"])}" alt="Profile Picture">
                                 <div class="status" style="background-color: {color}"></div>
-                                <h2>{user[2]}</h2></button>
+                                <h2>{user["display_name"]}</h2></button>
                               </div>
                             '''
 
         return users_chat
     elif req == 'load-profile':
         target = request.args.get('target')
-        cur.execute('SELECT username,pfp,display_name FROM users WHERE username = ?',(target,))
-        res = cur.fetchone()
+
+        res = list(db.find("users", {"username": target}, {"username": 1, "display_name": 1}))[0]
+
+        # cur.execute('SELECT username,pfp,display_name FROM users WHERE username = ?',(target,))
+        # res = cur.fetchone()
 
         response = f'''
         <div class="user-info-container">
-            <img src="{res[1]}" alt="pfp.png" id="side-profile-img">
-            <h1>{res[0]}</h1>
-            <h4>{res[2]}</h4>
+            <img src="{ url_for('pfp.request_pfp', name = res["username"])}" alt="pfp.png" id="side-profile-img">
+            <h1>{res["username"]}</h1>
+            <h4>{res["display_name"]}</h4>
         </div>
         <div class="line"></div>
         <div class="general-info-container">
-            MORE COMING SOON
+            <button type="button">pinned messages</button>
+            <button type="button">search</button>
+            <button type="button">media</button>
+            <button type="button" class="green">add friend</button>
+            <button type="button" class="red">block</button>
+            <button type="button" class="red">report</button>
+            
         </div>
 
         '''
@@ -64,28 +95,59 @@ def data():
         target = request.args.get('target')
         username = request.args.get('name')
 
-        cur.execute('SELECT * FROM messages WHERE (from_user = ? AND to_user = ?) OR (from_user = ? AND to_user = ?) ORDER BY msg_date',(target,username,username,target,))
-        res = cur.fetchall()
-        cur.execute('SELECT username,pfp FROM users WHERE username = ? or username = ?',(target,username))
-        users_pfp = cur.fetchall()
+        query = {
+            "$or": [
+                {
+                    "from": target,
+                    "to": username
+                },
+                {
+                    "from": username,
+                    "to": target
+                }
+            ]
+        }
+
+        res = db.find("messages",query,sort=["msg_date",1])
+        # cur.execute('SELECT * FROM messages WHERE (from_user = ? AND to_user = ?) OR (from_user = ? AND to_user = ?) ORDER BY msg_date',(target,username,username,target,))
+        # res = cur.fetchall()
+
         response = ''
 
         last = ''
 
+        now_date = dt.datetime.now()
+
+        db.update_many("messages",{"from": target,"to": username},{"$set": {"seen_at": now_date}})
+        # cur.execute('UPDATE messages SET seen_at = ? WHERE from_user = ? AND to_user = ?',(now_date,target,username))
+        # con.commit()
+
         for msg in res:
+            
 
-            pfp = ''
+            # cur.execute('SELECT pfp FROM users WHERE username = ?',(msg[1],))
 
-            if msg[0] == users_pfp[0][0]:
-                pfp = users_pfp[0][1]
-            else:
-                pfp = users_pfp[1][1]
+            # pfp = cur.fetchone()[0]
 
-            date = dt.datetime.strptime(msg[3], '%Y-%m-%d %H:%M:%S.%f')
-
-            now_date = dt.datetime.now()
+            date = msg["msg_date"]
 
             time = date.strftime('%H') + ':' + date.strftime("%M") 
+
+
+            user = ''
+
+            if msg["reply"]:
+
+                to = list(db.find("messages",{"msg_id": msg["reply"]},{"from": 1}))[0]
+
+                # cur.execute("SELECT from_user FROM messages WHERE msg_id = ? ",(msg[6],))
+                # to = cur.fetchone()[0]
+                if msg["from"] == to["from"]:
+                    to = 'himself'
+                user = msg["from"] + ' Replied to ' + to["from"]
+            else:
+                user = msg["from"]
+
 
             if date.strftime('%Y-%m-%d') != last:
                 if date.strftime('%Y-%m-%d') == now_date.strftime('%Y-%m-%d'):
@@ -98,16 +160,46 @@ def data():
 
             response += f'''
 
-                <div class="message">
-                    <img src="{pfp}" alt="pfp" class="profile-pic">
+                <div id="message{msg["msg_id"]}" class="message">
+                    <img src="{ url_for('pfp.request_pfp', name = msg["from"])}" alt="pfp" class="profile-pic">
                     <div class="message-content">
                         <div class="message-header">
-                            <span class="person">{msg[0]}</span>
+                            <span class="person">{user}</span>
                             <span class="timestamp">{time}</span>
                         </div>
-                        <div class="text">{msg[2]}</div>
+                        <div class="text">{msg["msg"]}</div>
+                    </div>
+                    <div id="{msg["msg_id"]}" style="visibility: hidden"  class="menu">
+                        <div class="menu-item" onclick="editMessage()"  ><i class="fa fa-edit"></i></div>
+                        <div class="menu-item" onclick="deleteMessage()"><i class="fa fa-trash-o"></i></div>
+                        <div class="menu-item" onclick="reply({msg["msg_id"]})"><i class="fa fa-reply"></i></div>
                     </div>
                 </div>
                 '''
-            
-    return response
+
+        return response
+    elif req == 'load-id':
+        target = request.args.get('target')
+        username = request.args.get('name')
+
+        query = {
+            "$or": [
+                {
+                    "from": target,
+                    "to": username
+                },
+                {
+                    "from": username,
+                    "to": target
+                }
+            ]
+        }
+
+        res = list(db.find("messages",query,{"msg_id": 1},sort=["msg_date",1]))
+
+        # cur.execute('SELECT msg_id FROM messages WHERE (from_user = ? AND to_user = ?) OR (from_user = ? AND to_user = ?) ORDER BY msg_date',(target,username,username,target,))
+        # res = cur.fetchall()
+        if res != []:
+            return jsonify({'id': int(res[0]["msg_id"])})
+        else:
+            return jsonify({"id": 1})
