@@ -76,22 +76,22 @@ function load_chat(target, request) {
         fetch(url2)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                        throw new Error('Network response was not ok');
+                    }
                 return response.json();
             })
             .then(data => {
                 for(let i in data.id){
-                    let tgt = document.getElementById(`message${data.id[i][0]}`)
+                    const tgt = document.getElementById(`message${data.id[i]}`)
                     
                     tgt.addEventListener("mouseleave",(event) =>{
-                        document.getElementById(data.id[i][0]).style.visibility = "hidden";
+                        document.getElementById(data.id[i]).style.visibility = "hidden";
                     })
                     
                     
                     tgt.addEventListener("mouseenter",(event) =>{
                         if(tgt.contains(event.target)){
-                            document.getElementById(data.id[i][0]).style.visibility = "visible";
+                            document.getElementById(data.id[i]).style.visibility = "visible";
                         }
                     })
 

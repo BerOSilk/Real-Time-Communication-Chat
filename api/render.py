@@ -138,12 +138,12 @@ def data():
 
             if msg["reply"]:
 
-                to = list(db.find("messages",{"msg_id": msg["reply"]},{"from": 1}))[0]
+                to = list(db.find("messages",{"_id": msg["_id"]},{"from": 1}))[0]
 
                 # cur.execute("SELECT from_user FROM messages WHERE msg_id = ? ",(msg[6],))
                 # to = cur.fetchone()[0]
                 if msg["from"] == to["from"]:
-                    to = 'himself'
+                    to["from"] = 'himself'
                 user = msg["from"] + ' Replied to ' + to["from"]
             else:
                 user = msg["from"]
@@ -160,7 +160,7 @@ def data():
 
             response += f'''
 
-                <div id="message{msg["msg_id"]}" class="message">
+                <div id="message{msg["_id"]}" class="message">
                     <img src="{ url_for('pfp.request_pfp', name = msg["from"])}" alt="pfp" class="profile-pic">
                     <div class="message-content">
                         <div class="message-header">
@@ -169,10 +169,10 @@ def data():
                         </div>
                         <div class="text">{msg["msg"]}</div>
                     </div>
-                    <div id="{msg["msg_id"]}" style="visibility: hidden"  class="menu">
+                    <div id="{msg["_id"]}" style="visibility: hidden"  class="menu">
                         <div class="menu-item" onclick="editMessage()"  ><i class="fa fa-edit"></i></div>
                         <div class="menu-item" onclick="deleteMessage()"><i class="fa fa-trash-o"></i></div>
-                        <div class="menu-item" onclick="reply({msg["msg_id"]})"><i class="fa fa-reply"></i></div>
+                        <div class="menu-item" onclick="reply('{str(msg["_id"])}')"><i class="fa fa-reply"></i></div>
                     </div>
                 </div>
                 '''
@@ -195,11 +195,14 @@ def data():
             ]
         }
 
-        res = list(db.find("messages",query,{"msg_id": 1},sort=["msg_date",1]))
+        res = list(db.find("messages",query,sort=["msg_date",1]))
 
+        l = []
+
+        for i in res:
+            l.append(str(i["_id"]))
+        # print(l)
         # cur.execute('SELECT msg_id FROM messages WHERE (from_user = ? AND to_user = ?) OR (from_user = ? AND to_user = ?) ORDER BY msg_date',(target,username,username,target,))
         # res = cur.fetchall()
-        if res != []:
-            return jsonify({'id': int(res[0]["msg_id"])})
-        else:
-            return jsonify({"id": 1})
+        
+        return jsonify({'id': l})

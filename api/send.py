@@ -7,6 +7,22 @@ db = Database("database")
 
 snd =  Blueprint('send',__name__)
 
+# def get_max(max_id):
+#     mx_len = 0
+
+#     for msg in max_id:
+#         print(type(msg["msg_id"]))
+#         print(msg["msg_id"])
+#         mx_len = max(mx_len,msg["msg_id"])
+#     return mx_len
+#     # l = []
+
+#     # for msg in max_id:
+#     #     if len(msg["msg_id"]) == mx_len:
+#     #         l.append[int(msg["msg_id"])]
+    
+#     # return max(l)
+
 @snd.route('/send', methods=['POST'])
 def send():
 
@@ -23,12 +39,8 @@ def send():
 
     time_now = date_now.strftime('%H') + ':' + date_now.strftime('%M')
 
-    max_id = list(db.find("messages",{"msg_id": 1},sort=["msg_id",-1]))
-
-    if max_id == []:
-        max_id = 1
-    else:
-        max_id = int(max_id[0]["msg_id"]) + 1
+    # max_id = list(db.find("messages",{"from": name,"to": to},{"msg_id": 1}))
+    # max_id = get_max(max_id) + 1
 
     # cur.execute('SELECT msg_id FROM messages ORDER BY msg_id DESC')
     # max_id = int(cur.fetchone()[0]) + 1
@@ -37,7 +49,6 @@ def send():
 
     if req == 'reply':
         db.insert("messages",[{
-            "msg_id": max_id,
             "from": name,
             "to": to,
             "msg": msg,
@@ -48,7 +59,6 @@ def send():
         # cur.execute('INSERT INTO messages VALUES (?,?,?,?,?,NULL,?)',(max_id,name,to,msg,date_now,data.get('id')))
     else:
         db.insert("messages",[{
-            "msg_id": max_id,
             "from": name,
             "to": to,
             "msg": msg,
