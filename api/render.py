@@ -79,14 +79,14 @@ def data():
         </div>
         <div class="line"></div>
         <div class="general-info-container">
-            <button type="button">pinned messages</button>
-            <button type="button">search</button>
-            <button type="button">media</button>
+            <button type="button" class="pingged_messages">pinned messages</button>
+            <button type="button" class="search">search</button>
+            <button type="button" class="media">media</button>
             <button type="button" class="green">add friend</button>
             <button type="button" class="red">block</button>
             <button type="button" class="red">report</button>
             
-        </div>
+        </div>  
 
         '''
         
