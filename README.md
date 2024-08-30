@@ -6,4 +6,4 @@ Main-Chat is a way to communicate between each other by sending messages, files.
 
 Main-Chat gives you the abbility to add friends, ping messages, and search for what ever you want in the chat.
 
-You can also report or block any user that may cause any problems to you.
+You can also <red style="color: red">report</red> or block any user that may cause any problems to you.
