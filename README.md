@@ -84,3 +84,45 @@
 | socket method | name | Description |
 | --- | --- | --- |
 | emit | py login request | Emit the data from javascript to python to show that the user is online. |
+
+<h1>Endpoints</h1>
+
+### Endpoints used here is request conditions as showen bellow:
+
+## Authentication
+
+- **HTTP method**: POST
+- **endpoint**: /auth
+- **Request Conditions**:
+    - **signin**: proccess a login request
+    - **signout**: proccess a register request
+
+## Render
+
+- **HTTP method**: POST
+- **endpoint**: /render
+- **Request Conditions**:
+    - **search**: proccess the search to search for users.
+    - **load-profile**: proccess the user side profile load.
+    - **load-chat**: proccess the user chat and messages load.
+    - **load-id**: proccess the messages id as a list.
+
+## Request pfp
+
+- **HTTP method**: POST
+- **endpoint**: /pfp
+- **Description**: load and render the user pfp.
+
+## Send
+
+- **HTTP method**: POST
+- **endpoint**: /send
+- **Request Conditions**:
+    - **reply**: proccess the reply to message.
+    - **otherwise**: send a normal message.
+
+## update
+- **HTTP method**: POST
+- **endpoint**: /update
+- **Description**: Update the user settings and information
+
