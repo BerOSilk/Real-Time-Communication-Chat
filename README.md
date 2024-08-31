@@ -52,6 +52,7 @@
 <h3>Python</h3>
 
 <h5>app.py</h5>
+
 | socket method | name | Description |
 | --- | --- | --- |
 | on | request data | Requesting the data from javascript to send the message to the user. |
