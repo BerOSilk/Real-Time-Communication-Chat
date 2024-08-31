@@ -1,6 +1,9 @@
 <h1>Welcome to Main-Chat</h1>
 <h4>Created by Baraa AbuKhalil (BeroSilk)</h4>
 
+[!NOTE]
+This version is not the final version, there will be updates in the future.
+
 <h1>Key features</h1>
 <h3>User Authentication</h3>
 
@@ -36,3 +39,11 @@
 - **User info**: Showing the user information such as username, display name, profile picture, and status.
 - **Global Actions buttons**: Allows the user to report, block the user, or add the user as a friend.
 - **Global Chat Actions buttons**: Allows the user to see pinned messages, media files, or search in the chat.
+
+<h1>APIs<h1>
+
+- **Authentication**: Allows the user to register or login in the app
+- **Render**: Render chats, profiles.
+- **Request pfp**: Retriving and render Profile Pictures from the database.
+- **Send**: Send the message to the user and store it in the database.
+- **Update**: Update user settings in the database and the page.
