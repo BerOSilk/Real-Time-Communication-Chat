@@ -51,12 +51,18 @@
 <h1>Sockets</h1>
 <h3>Python</h3>
 
-- **Request Data**
-- **Send Logout Request**
-- **py Login Request**
+<h5>app.py</h5>
+| socket method | name | Description |
+| --- | --- | --- |
+| on | request data | Requesting the data from javascript to send the message to the user. |
+| emit | receive data | Emit the data from python to javascript to load the message sent to the user. |
+| on | send logout request | Requesting data from javascript to show that the user is offline now. | 
+| emit | logout request | emit the data from python to javascript to show that the user is offline. |
+| on | py login request | Requesting data from javascript to show that the user is online now. |
+| emit | login request | emit the data from python to javascript to show that the user is online. |
 
 <h3>JavaScript</h3>
 
-- **Receive Data**
+- **Receive Data**: Receive the data
 - **Login Request**
 - **Logout Request**
