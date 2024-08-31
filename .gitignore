@@ -1,3 +1,5 @@
 venv
 .cph
 ERD.drawio
+package-lock.json
+package.json

@@ -27,6 +27,7 @@
 
 - **Sending Messages between Users**: Send messages between each others to communicate.
 - **Real Time Communication**: Allows the user on the other side to recieve the message at the same real time.
+- **Files Messages**: Allows the user to send files as message.
 - **Message sound Notification**: it will play a sound to notify the user that a new message came.
 - **Reply to a message**: Allows the user to reply to a message
 
