@@ -143,7 +143,7 @@
 
 # Coming soon
 
-### **Report, block, ping messages, search in chat, media, add friend, send files are all coming soon**
+### **Report, block, pin messages, search in chat, media, add friend, and sending files are all coming soon**
 
 # Get Involved
 
