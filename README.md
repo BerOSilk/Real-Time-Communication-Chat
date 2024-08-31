@@ -121,8 +121,40 @@
     - **reply**: proccess the reply to message.
     - **otherwise**: send a normal message.
 
-## update
+## Update
 - **HTTP method**: POST
 - **endpoint**: /update
 - **Description**: Update the user settings and information
 
+# Technology Stack Overview
+
+## Technologies Used
+
+- **Python**: Main Programming language
+- **Flask**: Python Library for building web-pages
+
+## Database
+
+- **MongoDB**: Utilizing Mongo server for database management, ensuring efficient storage and retrieval of application data.
+
+## Image Storage
+
+- **GridFS**: Storing image as a MongoDB collections, GridFS stores files in two collections: one for file chunks and another for file metadata.
+
+# Coming soon
+
+### **Report, block, ping messages, search in chat, media, add friend, send files are all coming soon**
+
+# Get Involved
+
+Your Feedback and Contributions are welcome!
+
+## Ways to Contribute:
+- **Feedback**: Share your thoughts and ideas.
+- **Issue Reporting**: Help us by reporting any bugs or issues on GitHub.
+- **Code Contributions**: Contribute to the codebase.
+
+## Contact and Support:
+Email: 1990.khalilbaraa@gmail.com
+
+Thank you for your interest. I look forward to hearing from you!
