@@ -80,6 +80,7 @@
 | emit | send logout request | Emit the data from javascript to python to show that the uesr is offline now. |
 
 - **main.html**
+
 | socket method | name | Description |
 | --- | --- | --- |
 | emit | py login request | Emit the data from javascript to python to show that the user is online. |
