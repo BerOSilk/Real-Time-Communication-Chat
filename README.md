@@ -42,8 +42,21 @@
 
 <h1>APIs<h1>
 
-- **Authentication**: Allows the user to register or login in the app
-- **Render**: Render chats, profiles.
-- **Request pfp**: Retriving and render Profile Pictures from the database.
-- **Send**: Send the message to the user and store it in the database.
-- **Update**: Update user settings in the database and the page.
+### - **Authentication**: Allows the user to register or login in the app
+### - **Render**: Render chats, profiles.
+### - **Request pfp**: Retriving and render Profile Pictures from the database.
+### - **Send**: Send the message to the user and store it in the database.
+### - **Update**: Update user settings in the database and the page.
+
+<h1>Sockets</h1>
+<h3>Python</h3>
+
+- **Request Data**
+- **Send Logout Request**
+- **py Login Request**
+
+<h3>JavaScript</h3>
+
+- **Receive Data**
+- **Login Request**
+- **Logout Request**
