@@ -1,8 +1,8 @@
 <h1>Welcome to Main-Chat</h1>
 <h4>Created by Baraa AbuKhalil (BeroSilk)</h4>
 
-[!NOTE]
-This version is not the final version, there will be updates in the future.
+>[!NOTE]
+>This version is not the final version, there will be updates in the future.
 
 <h1>Key features</h1>
 <h3>User Authentication</h3>
