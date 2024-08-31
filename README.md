@@ -4,4 +4,5 @@
 <h1>Key features</h1>
 <h3>User Authentication</h3>
 -User Registration: Allows new users to create accounts by providing necessary information.
+
 -User Login: Enables registered users to log in securely to access booking features.
